@@ -13,6 +13,7 @@ import { doc, getFirestore, setDoc } from "firebase/firestore";
 import app from "@/lib/firebase";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { usePosts } from "@/context/AppContext";
 
 export enum FormFieldType {
   INPUT = "input",
@@ -27,6 +28,11 @@ export enum FormFieldType {
 const PatientForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const { posts, getPosts } = usePosts() || {
+    posts: [],
+    getPosts: () => {},
+  };
+
   const form = useForm({
     resolver: zodResolver(UserFormValidation),
     defaultValues: {
@@ -55,6 +61,9 @@ const PatientForm = () => {
       toast.success("Patient form submitted successfully!");
       setIsLoading(false);
       reset();
+      if (posts) {
+        router.push(`/patients/${Date.now().toString()}/register`);
+      }
     } catch (error) {
       console.log("🚀 ~ onSubmit ~ error:", error);
     }
