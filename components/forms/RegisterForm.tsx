@@ -23,11 +23,11 @@ import { PatientFormValidation, registraionForm } from "@/lib/formSchema";
 import CustomFormField from "../CustomFormField";
 
 interface RegisterFormProps {
-  Id: string;
+  Id?: string;
 }
 
 type PatientFormData = z.infer<typeof PatientFormValidation>;
-const RegisterForm = ({ Id }: RegisterFormProps) => {
+const RegisterForm = ({ Id = "" }: RegisterFormProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { posts } = usePosts() || {

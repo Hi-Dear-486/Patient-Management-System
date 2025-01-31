@@ -20,7 +20,13 @@ const Registeration = () => {
             alt="patient"
             className="mb-12 h-10 w-fit"
           />
-          <RegisterForm Id={params.userId} />
+          <RegisterForm
+            Id={
+              typeof params.userId === "string"
+                ? params.userId
+                : params.userId?.[0] ?? ""
+            }
+          />
           <div className="text-14-regular mt-20 flex justify-between">
             <p className="justify-items-end text-dark-600 xl:text-left">
               © 2024 CarePulse
