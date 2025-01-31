@@ -7,8 +7,12 @@ import { toast } from "react-toastify";
 import app from "@/lib/firebase";
 import "react-toastify/dist/ReactToastify.css"; // Make sure you import the CSS
 
-const CancelledBtn = ({ Id }: any) => {
-  const { posts, getPosts } = usePosts()!;
+interface CancelledBtnProps {
+  Id: string; // Define the Id as string
+}
+
+const CancelledBtn = ({ Id }: CancelledBtnProps) => {
+  const { getPosts } = usePosts()!;
   const db = getFirestore(app);
 
   const handleDelete = async (postId: string) => {
@@ -17,17 +21,18 @@ const CancelledBtn = ({ Id }: any) => {
       await deleteDoc(postRef);
       getPosts();
       toast.success("Your post has been successfully deleted");
-    } catch (error) {
-      toast.error("Error deleting the post");
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        toast.error(error.message); // Access message safely
+      } else {
+        toast.error("An unknown error occurred");
+      }
     }
   };
 
   return (
     <div>
-      <Button
-        className="min-w-[120px]"
-        onClick={() => handleDelete(Id)} // Pass the item (or an appropriate value) to handleDelete
-      >
+      <Button className="min-w-[120px]" onClick={() => handleDelete(Id)}>
         <Image
           src="/assets/icons/cancelled.svg"
           width={20}

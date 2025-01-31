@@ -1,11 +1,10 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { Form, FormControl } from "@/components/ui/form";
-import CustomFormField from "../CustomFormField";
 import SubmitButton from "../SubmitButton";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
 import { doc, getFirestore, setDoc } from "firebase/firestore";
@@ -20,10 +19,15 @@ import { Label } from "../ui/label";
 import { SelectItem } from "../ui/select";
 import Image from "next/image";
 import { FileUploader } from "../FileUploader";
-import { PatientFormValidation } from "@/lib/validation";
-import { trackFallbackParamAccessed } from "next/dist/server/app-render/dynamic-rendering";
+import { PatientFormValidation, registraionForm } from "@/lib/formSchema";
+import CustomFormField from "../CustomFormField";
 
-const RegisterForm = ({ Id }: any) => {
+interface RegisterFormProps {
+  Id: string;
+}
+
+type PatientFormData = z.infer<typeof PatientFormValidation>;
+const RegisterForm = ({ Id }: RegisterFormProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { posts, getPosts } = usePosts() || {
@@ -31,50 +35,37 @@ const RegisterForm = ({ Id }: any) => {
     getPosts: () => {},
   };
 
-  const form = useForm({
+  const form = useForm<PatientFormData>({
     resolver: zodResolver(PatientFormValidation),
-    defaultValues: {
-      name: "",
-      email: "",
-      phone: "",
-      address: "",
-      occupation: "",
-      emergencyContactName: "",
-      emergencyContactNumber: "",
-      primaryPhysician: "",
-      insuranceProvider: "",
-      insurancePolicyNumber: "",
-      allergies: "",
-      currentMedication: "",
-      familyMedicalHistory: "",
-      pastMedicalHistory: "",
-      identificationType: "",
-      identificationNumber: "",
-      identificationDocument: [],
-      treatmentConsent: false,
-      disclosureConsent: false,
-      privacyConsent: false,
-    },
+    defaultValues: registraionForm,
   });
 
   const { handleSubmit, reset } = form;
 
   // Define onSubmit function
-  const onSubmit = async (data: z.infer<typeof PatientFormValidation>) => {
-    setIsLoading(true);
-    try {
-      const db = getFirestore(app);
-      await setDoc(doc(db, "patientform", Id), data);
-      toast.success("Patient form submitted successfully!");
-      setIsLoading(false);
-      reset();
-      if (posts) {
-        router.push(`/patients/${Id}/appointment`);
+  const onSubmit = useCallback<SubmitHandler<PatientFormData>>(
+    async (data) => {
+      setIsLoading(true);
+      try {
+        const db = getFirestore(app);
+        await setDoc(doc(db, "patientform", Id), data);
+        toast.success("Patient form submitted successfully!");
+        setIsLoading(false);
+        reset();
+
+        if (posts) {
+          router.push(`/patients/${Id}/appointment`);
+        }
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          toast.error(error.message);
+        } else {
+          toast.error("An unknown error occurred");
+        }
       }
-    } catch (error: any) {
-      toast.error(error.message);
-    }
-  };
+    },
+    [Id, posts, router, reset]
+  );
 
   return (
     <Form {...form}>
@@ -93,7 +84,7 @@ const RegisterForm = ({ Id }: any) => {
           fieldType={FormFieldType.INPUT}
           name="name"
           label="Full Name"
-          placeholder="Muhammad Zeeshan"
+          placeholder="Enter name"
           iconSrc="/assets/icons/user.svg"
           iconAlt="user"
         />
@@ -104,7 +95,7 @@ const RegisterForm = ({ Id }: any) => {
             fieldType={FormFieldType.INPUT}
             name="email"
             label="Email"
-            placeholder="zeeshan11651@gmail.com"
+            placeholder="Enter email"
             iconSrc="/assets/icons/email.svg"
             iconAlt="user"
           />

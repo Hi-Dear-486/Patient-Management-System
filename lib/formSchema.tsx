@@ -75,6 +75,7 @@ export const PatientFormValidation = z.object({
   treatmentConsent: z.boolean().optional(),
   disclosureConsent: z.boolean().optional(),
   privacyConsent: z.boolean().optional(),
+  birthDate: z.union([z.string(), z.date()]).optional(),
 });
 
 export const AppointmentFormValidation = z.object({
@@ -101,3 +102,28 @@ export const AppointmentFormValidation = z.object({
     })
     .optional(),
 });
+
+export const registraionForm = {
+  name: "",
+  email: "",
+  phone: "",
+  address: "",
+  occupation: "",
+  emergencyContactName: "",
+  emergencyContactNumber: "",
+  primaryPhysician: "",
+  insuranceProvider: "",
+  insurancePolicyNumber: "",
+  allergies: "",
+  currentMedication: "",
+  familyMedicalHistory: "",
+  pastMedicalHistory: "",
+  identificationType: "",
+  identificationNumber: "",
+  identificationDocument: [],
+  treatmentConsent: false,
+  disclosureConsent: false,
+  privacyConsent: false,
+  birthDate: "",
+  gender: undefined,
+};

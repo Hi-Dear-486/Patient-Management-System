@@ -6,7 +6,7 @@ import { Form } from "@/components/ui/form";
 import CustomFormField from "../CustomFormField";
 import SubmitButton from "../SubmitButton";
 import { useState } from "react";
-import { UserFormValidation } from "@/lib/validation";
+import { UserFormValidation } from "@/lib/formSchema";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
 import { doc, getFirestore, setDoc } from "firebase/firestore";
@@ -14,6 +14,7 @@ import app from "@/lib/firebase";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { usePosts } from "@/context/AppContext";
+import { getAuth } from "firebase/auth";
 
 export enum FormFieldType {
   INPUT = "input",
@@ -28,7 +29,7 @@ export enum FormFieldType {
 const PatientForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const { posts, getPosts } = usePosts() || {
+  const { posts } = usePosts() || {
     posts: [],
     getPosts: () => {},
   };
@@ -51,8 +52,15 @@ const PatientForm = () => {
     phone,
   }: z.infer<typeof UserFormValidation>) => {
     setIsLoading(true);
-    // we will use firestore
     try {
+      const auth = getAuth();
+      const user = auth.currentUser;
+
+      if (!user) {
+        toast.error("You must be logged in to submit the form");
+        setIsLoading(false);
+        return;
+      }
       const userData = { name, email, phone };
       const db = getFirestore(app);
       await setDoc(doc(db, "patientform", Date.now().toString()), {
@@ -81,7 +89,7 @@ const PatientForm = () => {
           fieldType={FormFieldType.INPUT}
           name="name"
           label="Full name"
-          placeholder="Muhammad Zeeshan"
+          placeholder="Enter name"
           iconSrc="/assets/icons/user.svg"
           iconAlt="user"
         />
@@ -90,7 +98,7 @@ const PatientForm = () => {
           fieldType={FormFieldType.INPUT}
           name="email"
           label="Email"
-          placeholder="zeeshan11651@gmail.com"
+          placeholder="Enter email"
           iconSrc="/assets/icons/email.svg"
           iconAlt="user"
         />

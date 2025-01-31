@@ -6,7 +6,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Control } from "react-hook-form";
+import { Control, FieldValues, Path } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { FormFieldType } from "./forms/PatientForm";
 import Image from "next/image";
@@ -17,10 +17,11 @@ import "react-datepicker/dist/react-datepicker.css";
 import { Select, SelectContent, SelectTrigger, SelectValue } from "./ui/select";
 import { Textarea } from "./ui/textarea";
 import { Checkbox } from "./ui/checkbox";
-interface CustomProps {
-  control: Control<any>;
+
+interface CustomProps<T extends FieldValues> {
+  control: Control<T>;
   fieldType: FormFieldType;
-  name: string;
+  name: Path<T>;
   label?: string;
   placeholder?: string;
   iconSrc?: string;
@@ -29,10 +30,30 @@ interface CustomProps {
   dateFormat?: string;
   showTimeSelect?: boolean;
   children?: React.ReactNode;
-  renderSkeleton?: (field: any) => React.ReactNode;
+  renderSkeleton?: (field: FieldValues) => React.ReactNode;
 }
 
-const RenderInput = ({ field, props }: { field: any; props: CustomProps }) => {
+interface FormData {
+  name: string;
+  email: string;
+  phone: string;
+  address: string;
+  occupation: string;
+  emergencyContactName: string;
+  emergencyContactNumber: string;
+  primaryPhysician: string;
+  insuranceProvider: string;
+  insurancePolicyNumber: string;
+  identificationDocument: string;
+  birthDate: string; // Add birthDate here
+}
+const RenderInput = <T extends FieldValues>({
+  field,
+  props,
+}: {
+  field: FieldValues;
+  props: CustomProps<T>;
+}) => {
   const {
     fieldType,
     iconSrc,
@@ -72,8 +93,8 @@ const RenderInput = ({ field, props }: { field: any; props: CustomProps }) => {
             placeholder={placeholder}
             international
             withCountryCallingCode
-            value={field.value as undefined}
-            onChange={field.onChange}
+            onChange={(value) => field.onChange?.(value)}
+            {...field}
             className="input-phone"
           />
         </FormControl>
@@ -149,22 +170,25 @@ const RenderInput = ({ field, props }: { field: any; props: CustomProps }) => {
       break;
   }
 };
-const CustomFormField = (props: CustomProps) => {
+const CustomFormField = <T extends FieldValues>(props: CustomProps<T>) => {
   const { control, fieldType, name, label } = props;
   return (
     <div>
       <FormField
         control={control}
         name={name}
-        render={({ field }) => (
-          <FormItem className="flex-1">
-            {fieldType !== FormFieldType.CHECKBOX && label && (
-              <FormLabel>{label}</FormLabel>
-            )}
-            <RenderInput field={field} props={props} />
-            <FormMessage className="shad-error" />
-          </FormItem>
-        )}
+        render={({ field }) => {
+          return (
+            <FormItem className="flex-1">
+              {fieldType !== FormFieldType.CHECKBOX && label && (
+                <FormLabel>{label}</FormLabel>
+              )}
+
+              <RenderInput field={field} props={props} />
+              <FormMessage className="shad-error" />
+            </FormItem>
+          );
+        }}
       />
     </div>
   );

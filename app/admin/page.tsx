@@ -15,7 +15,7 @@ const Dashboard = () => {
   });
   useEffect(() => {
     getPosts();
-  }, [posts]);
+  }, [getPosts]);
 
   return (
     <div className="mx-auto flex max-w-7xl flex-col space-y-14">

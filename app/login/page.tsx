@@ -7,9 +7,8 @@ import React, { useEffect } from "react";
 import { toast } from "react-toastify";
 
 const AdminLogin = () => {
-  const { user, googleSignIn, logOut } = usePosts() ?? {};
+  const { user, googleSignIn } = usePosts() ?? {};
   const router = useRouter();
-  console.log(user);
 
   const handlesignin = async () => {
     try {

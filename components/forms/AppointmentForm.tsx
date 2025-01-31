@@ -6,7 +6,7 @@ import { Form } from "@/components/ui/form";
 import CustomFormField from "../CustomFormField";
 import SubmitButton from "../SubmitButton";
 import { useState } from "react";
-import { AppointmentFormValidation } from "@/lib/validation";
+import { AppointmentFormValidation } from "@/lib/formSchema";
 import { useRouter } from "next/navigation";
 import { doc, getFirestore, setDoc } from "firebase/firestore";
 import app from "@/lib/firebase";
@@ -18,7 +18,10 @@ import { SelectItem } from "../ui/select";
 import Image from "next/image";
 import { FormFieldType } from "./PatientForm";
 
-const PatientForm = ({ userId }: any) => {
+interface PatientFormProps {
+  userId: string;
+}
+const PatientForm = ({ userId }: PatientFormProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { posts, getPosts } = usePosts() || {

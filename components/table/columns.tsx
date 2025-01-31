@@ -1,7 +1,6 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { Button } from "@/components/ui/button";
 import { Doctors } from "@/constants";
 import Image from "next/image";
 import { format } from "date-fns";
@@ -18,7 +17,7 @@ import CancelledBtn from "../CancelledBtn";
 export type UserData = {
   additionalcomments: string;
   doctor: string;
-  expectedappointmentdate: any;
+  expectedappointmentdate: string | Date; // Using union type
 };
 
 export type Post = {
@@ -90,11 +89,13 @@ export const columns: ColumnDef<Post | unknown>[] = [
         Appointment
       </div>
     ),
+
     cell: ({ row }) => {
       const appointment = row.original as Post;
       const appointmentDate = appointment.userdata?.expectedappointmentdate;
 
       if (!appointmentDate) {
+        // If there's no appointment date, return a message
         return (
           <p className="text-14-regular text-center min-w-[120px]">
             No appointment date
@@ -102,8 +103,34 @@ export const columns: ColumnDef<Post | unknown>[] = [
         );
       }
 
-      const date = new Date(appointmentDate.seconds * 1000);
+      let date: Date;
+
+      // Check if appointmentDate has 'seconds' (i.e., it's a Firebase Timestamp-like object)
+      if (
+        appointmentDate &&
+        typeof appointmentDate === "object" &&
+        "seconds" in appointmentDate
+      ) {
+        date = new Date((appointmentDate as any).seconds * 1000); // Convert seconds to Date
+      }
+      // If appointmentDate is already a Date object or a string
+      else if (
+        appointmentDate instanceof Date ||
+        typeof appointmentDate === "string"
+      ) {
+        date = new Date(appointmentDate); // Convert string or use Date directly
+      } else {
+        // If appointmentDate is not in a valid format
+        return (
+          <p className="text-14-regular text-center min-w-[120px]">
+            Invalid appointment date
+          </p>
+        );
+      }
+
+      // Format the Date using date-fns
       const formattedDate = format(date, "MMM dd, yyyy", { locale: enUS });
+
       return (
         <p className="text-14-regular text-center min-w-[120px]">
           {formattedDate}
@@ -128,13 +155,16 @@ export const columns: ColumnDef<Post | unknown>[] = [
 
       return (
         <div className="flex items-center gap-3  min-w-[120px]">
-          <Image
-            src={doctor?.image!}
-            alt="doctor"
-            width={100}
-            height={100}
-            className="size-8"
-          />
+          {doctor?.image && (
+            <Image
+              src={doctor.image}
+              alt="doctor"
+              width={100}
+              height={100}
+              className="size-8"
+            />
+          )}
+
           <p className="whitespace-nowrap">Dr. {doctor?.name}</p>
         </div>
       );
