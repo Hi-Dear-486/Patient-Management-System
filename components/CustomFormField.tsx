@@ -33,20 +33,6 @@ interface CustomProps<T extends FieldValues> {
   renderSkeleton?: (field: FieldValues) => React.ReactNode;
 }
 
-interface FormData {
-  name: string;
-  email: string;
-  phone: string;
-  address: string;
-  occupation: string;
-  emergencyContactName: string;
-  emergencyContactNumber: string;
-  primaryPhysician: string;
-  insuranceProvider: string;
-  insurancePolicyNumber: string;
-  identificationDocument: string;
-  birthDate: string; // Add birthDate here
-}
 const RenderInput = <T extends FieldValues>({
   field,
   props,

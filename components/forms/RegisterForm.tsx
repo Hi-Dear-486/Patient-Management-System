@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { Form, FormControl } from "@/components/ui/form";
 import SubmitButton from "../SubmitButton";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
 import { doc, getFirestore, setDoc } from "firebase/firestore";
@@ -30,7 +30,7 @@ type PatientFormData = z.infer<typeof PatientFormValidation>;
 const RegisterForm = ({ Id }: RegisterFormProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const { posts, getPosts } = usePosts() || {
+  const { posts } = usePosts() || {
     posts: [],
     getPosts: () => {},
   };

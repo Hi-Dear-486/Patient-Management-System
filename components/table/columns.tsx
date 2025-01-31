@@ -92,10 +92,18 @@ export const columns: ColumnDef<Post | unknown>[] = [
 
     cell: ({ row }) => {
       const appointment = row.original as Post;
-      const appointmentDate = appointment.userdata?.expectedappointmentdate;
+      const isFirestoreTimestamp = (
+        value: unknown
+      ): value is { seconds: number } => {
+        return (
+          typeof value === "object" && value !== null && "seconds" in value
+        );
+      };
+
+      const appointmentDate =
+        appointment.userdata?.expectedappointmentdate || null;
 
       if (!appointmentDate) {
-        // If there's no appointment date, return a message
         return (
           <p className="text-14-regular text-center min-w-[120px]">
             No appointment date
@@ -105,22 +113,14 @@ export const columns: ColumnDef<Post | unknown>[] = [
 
       let date: Date;
 
-      // Check if appointmentDate has 'seconds' (i.e., it's a Firebase Timestamp-like object)
-      if (
-        appointmentDate &&
-        typeof appointmentDate === "object" &&
-        "seconds" in appointmentDate
-      ) {
-        date = new Date((appointmentDate as any).seconds * 1000); // Convert seconds to Date
-      }
-      // If appointmentDate is already a Date object or a string
-      else if (
+      if (isFirestoreTimestamp(appointmentDate)) {
+        date = new Date(appointmentDate.seconds * 1000);
+      } else if (
         appointmentDate instanceof Date ||
         typeof appointmentDate === "string"
       ) {
-        date = new Date(appointmentDate); // Convert string or use Date directly
+        date = new Date(appointmentDate);
       } else {
-        // If appointmentDate is not in a valid format
         return (
           <p className="text-14-regular text-center min-w-[120px]">
             Invalid appointment date
