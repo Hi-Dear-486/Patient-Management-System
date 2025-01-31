@@ -19,9 +19,9 @@ import Image from "next/image";
 import { FormFieldType } from "./PatientForm";
 
 interface PatientFormProps {
-  userId: string;
+  userId?: string;
 }
-const PatientForm = ({ userId }: PatientFormProps) => {
+const PatientForm = ({ userId = "" }: PatientFormProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { posts, getPosts } = usePosts() || {
