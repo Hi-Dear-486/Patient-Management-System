@@ -14,7 +14,6 @@ import app from "@/lib/firebase";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { usePosts } from "@/context/AppContext";
-import { getAuth } from "firebase/auth";
 
 export enum FormFieldType {
   INPUT = "input",
