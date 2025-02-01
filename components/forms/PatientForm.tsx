@@ -53,14 +53,6 @@ const PatientForm = () => {
   }: z.infer<typeof UserFormValidation>) => {
     setIsLoading(true);
     try {
-      const auth = getAuth();
-      const user = auth.currentUser;
-
-      if (!user) {
-        toast.error("You must be logged in to submit the form");
-        setIsLoading(false);
-        return;
-      }
       const userData = { name, email, phone };
       const db = getFirestore(app);
       await setDoc(doc(db, "patientform", Date.now().toString()), {
